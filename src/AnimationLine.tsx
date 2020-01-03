@@ -1,16 +1,53 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 import BezierEasing from "bezier-easing";
 
 type Point = [number, number];
-interface IAnimationLineProps extends React.HTMLProps<SVGPolylineElement>{
+
+interface IPointInfo extends React.HTMLProps<SVGCircleElement> {
+  point: Point,
+  animation: boolean,
+  length: number,
+}
+
+interface ILine {
+  totalLength: number
+  points: IPointInfo[]
+}
+interface IAnimationLineProps {
   points: Point[],
   animationTime: number;
   pulseAnimation: boolean;
   pulseTime?: number;
   pulseColor?: string;
   pulseRadius: number;
+  fill?: any;
+  opacity?: any;
+  stroke?: any;
+  strokeDashArray?: any;
+  strokeLinecap?: any;
+  strokeLineJoin?: any;
+  strokeWidth?: any;
+  transform?: any;
 }
+
+interface ILineProps {
+  length?: number,
+  animationTime?: number,
+  fill?: any;
+  opacity?: any;
+  stroke?: any;
+  strokeDashArray?: any;
+  strokeLinecap?: any;
+  strokeLineJoin?: any;
+  strokeWidth?: any;
+  transform?: any;
+};
+
+interface ICircleProps extends React.HTMLProps<SVGCircleElement> {
+  delay?: number,
+  pulseTime?: number
+};
 
 /** Line drawing animation*/
 const dash = keyframes`
@@ -20,7 +57,7 @@ to {
 `;
 
 /** Pulse animation*/
-const pulse = (x: number, y: number) => keyframes`
+const pulse = (x: any, y: any) => keyframes`
 0% {
  transform: scale(0);
  opacity: 0.8;
@@ -35,14 +72,14 @@ const pulse = (x: number, y: number) => keyframes`
 `;
 
 /** SVG Polyline with animation*/
-const Line = styled.polyline<{ length: number, animationTime: number }>`
+const Line = styled.polyline<ILineProps>`
   stroke-dasharray: ${props => props.length || "0"};
   stroke-dashoffset: ${props => props.length || "0"};
   animation: ${dash} ${props => props.animationTime || "0"}s ease forwards;
 `;
 
 /** SVG Circle with animation */
-const Circle = styled.circle<{ delay: number, pulseTime: number }>`
+const Circle = styled.circle<ICircleProps>`
   opacity: 0;
   animation: ${props => pulse(props.cx, props.cy)}  ${props => props.pulseTime || "0.5"}s linear forwards;
   animation-delay: ${props => props.delay || "0"}s;
@@ -50,7 +87,7 @@ const Circle = styled.circle<{ delay: number, pulseTime: number }>`
 
 //Map Bezier Curve for matching the time for the pulses animations
 var easing = BezierEasing(0.25,0.1,0.25,1);
-var easeCurve = Array.from(Array(1001).keys()).reduce((acc, index) => {
+var easeCurveMap : { [progress: number]: number } = Array.from(Array(1001).keys()).reduce((acc, index) => {
   let time = 1-(index/1000);
   let progress = Math.round(easing(time) * 100) / 100
   return {
@@ -85,9 +122,10 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
   const { points, pulseAnimation } = props;
   const pointsString : string = points.reduce((acc, current) => `${acc} ${current[0]},${current[1]}`, "");
 
-  const curvePoints = points.reduce((acc, e, index) => {
+  const line = points.reduce((acc: ILine, e: Point, index: number) => {
     let extraLength = index === 0 ? 0 : distanceBetweenPoints(e, points[index-1]);
     let animation = (index === 0 || index === (points.length-1) || isCurve(points[index-1], e, points[index+1]));
+    console.log(acc.points)
     return {
       totalLength: acc.totalLength + extraLength,
       points: [
@@ -99,27 +137,35 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
         }
       ]
     }
-  }, {totalLength: 0, points: []});
+  }, { totalLength: 0, points: []});
 
   return (
     <g id="animationLine">
       <Line
-        {...props}
         points={pointsString}
-        length={curvePoints.totalLength}
+        length={line.totalLength}
         animationTime={props.animationTime}
+        fill={props.fill}
+        opacity={props.opacity}
+        stroke={props.stroke}
+        strokeDasharray={props.strokeDashArray}
+        strokeLinecap={props.strokeLinecap}
+        strokeLinejoin={props.strokeLineJoin}
+        strokeWidth={props.strokeWidth}
+        transform={props.transform}
       />
-      {pulseAnimation && curvePoints.points.map((e) => {
+      {pulseAnimation && line.points.map((e : IPointInfo) => {
         if(!e.animation) return <g/>;
-        const delay = easeCurve[Math.round(e.length/curvePoints.totalLength * 100) / 100]*props.animationTime;
+        const progress : number = Math.round(e.length/line.totalLength * 100) / 100
+        const delay : number = easeCurveMap[progress]*props.animationTime;
         return (
           <Circle
             key={`${e.point[0]}-${e.point[1]}`}
             fill={props.pulseColor || "blue"}
-            pulseTime={props.pulseTime}
             r={props.pulseRadius || 25}
             cx={e.point[0]}
             cy={e.point[1]}
+            pulseTime={props.pulseTime}
             delay={delay}>
           </Circle>
         );
