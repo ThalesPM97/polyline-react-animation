@@ -26,9 +26,10 @@ interface IAnimationLineProps {
   stroke?: any;
   strokeDashArray?: any;
   strokeLinecap?: any;
-  strokeLineJoin?: any;
+  strokeLinejoin?: any;
   strokeWidth?: any;
   transform?: any;
+  borderColor?: string;
 }
 
 interface ILineProps {
@@ -39,7 +40,7 @@ interface ILineProps {
   stroke?: any;
   strokeDashArray?: any;
   strokeLinecap?: any;
-  strokeLineJoin?: any;
+  strokeLinejoin?: any;
   strokeWidth?: any;
   transform?: any;
 };
@@ -141,6 +142,21 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
 
   return (
     <g id="animationLine">
+      {props.borderColor &&
+        <Line
+        points={pointsString}
+        length={line.totalLength}
+        animationTime={props.animationTime}
+        fill={props.fill}
+        opacity={props.opacity}
+        stroke={props.borderColor}
+        strokeDasharray={props.strokeDashArray}
+        strokeLinecap={props.strokeLinecap}
+        strokeLinejoin={props.strokeLinejoin}
+        strokeWidth={props.strokeWidth}
+        transform={props.transform}
+        />
+      }
       <Line
         points={pointsString}
         length={line.totalLength}
@@ -150,8 +166,8 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
         stroke={props.stroke}
         strokeDasharray={props.strokeDashArray}
         strokeLinecap={props.strokeLinecap}
-        strokeLinejoin={props.strokeLineJoin}
-        strokeWidth={props.strokeWidth}
+        strokeLinejoin={props.strokeLinejoin}
+        strokeWidth={props.borderColor? props.strokeWidth * 0.8: props.strokeWidth}
         transform={props.transform}
       />
       {pulseAnimation && line.points.map((e : IPointInfo) => {

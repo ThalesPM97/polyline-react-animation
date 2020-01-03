@@ -5,7 +5,7 @@ import './App.css';
 type Point = [number, number];
 
 function App() {
-  const points : Point[] = [[100, 108], [150, 150], [300, 310], [625, 300], [600, 305], [620, 125]];
+  const points : Point[] = [[100, 108], [150, 150], [300, 310], [600, 305], [620, 125]];
 
   return (
     <div className="App">
@@ -13,12 +13,15 @@ function App() {
         <AnimationLine
           points={points}
           animationTime={2}
-          stroke="black"
+          stroke="red"
           fill="none"
           pulseAnimation
           pulseColor="blue"
-          pulseRadius={10}
-          strokeWidth="2"
+          pulseRadius={30}
+          strokeWidth="30"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          borderColor="black"
         />
       </svg>
     </div>
