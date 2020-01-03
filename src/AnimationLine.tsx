@@ -123,10 +123,9 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
   const { points, pulseAnimation } = props;
   const pointsString : string = points.reduce((acc, current) => `${acc} ${current[0]},${current[1]}`, "");
 
-  const line = points.reduce((acc: ILine, e: Point, index: number) => {
+  const line : ILine = points.reduce((acc: ILine, e: Point, index: number) => {
     let extraLength = index === 0 ? 0 : distanceBetweenPoints(e, points[index-1]);
     let animation = (index === 0 || index === (points.length-1) || isCurve(points[index-1], e, points[index+1]));
-    console.log(acc.points)
     return {
       totalLength: acc.totalLength + extraLength,
       points: [
@@ -143,18 +142,18 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
   return (
     <g id="animationLine">
       {props.borderColor &&
-        <Line
-        points={pointsString}
-        length={line.totalLength}
-        animationTime={props.animationTime}
-        fill={props.fill}
-        opacity={props.opacity}
-        stroke={props.borderColor}
-        strokeDasharray={props.strokeDashArray}
-        strokeLinecap={props.strokeLinecap}
-        strokeLinejoin={props.strokeLinejoin}
-        strokeWidth={props.strokeWidth}
-        transform={props.transform}
+        <Line //Border Line === Line with the same coordinates but thicker
+          points={pointsString}
+          length={line.totalLength}
+          animationTime={props.animationTime}
+          fill={props.fill}
+          opacity={props.opacity}
+          stroke={props.borderColor}
+          strokeDasharray={props.strokeDashArray}
+          strokeLinecap={props.strokeLinecap}
+          strokeLinejoin={props.strokeLinejoin}
+          strokeWidth={props.strokeWidth}
+          transform={props.transform}
         />
       }
       <Line
@@ -170,6 +169,7 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
         strokeWidth={props.borderColor? props.strokeWidth * 0.8: props.strokeWidth}
         transform={props.transform}
       />
+      {/* Pulse animation for every curve*/}
       {pulseAnimation && line.points.map((e : IPointInfo) => {
         if(!e.animation) return <g/>;
         const progress : number = Math.round(e.length/line.totalLength * 100) / 100

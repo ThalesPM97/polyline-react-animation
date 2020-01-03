@@ -13,7 +13,7 @@ function App() {
         <AnimationLine
           points={points}
           animationTime={2}
-          stroke="red"
+          stroke="orange"
           fill="none"
           pulseAnimation
           pulseColor="blue"
