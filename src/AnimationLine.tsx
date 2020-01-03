@@ -142,7 +142,7 @@ const AnimationLine : React.FC<IAnimationLineProps> = (props) => {
   return (
     <g id="animationLine">
       {props.borderColor &&
-        <Line //Border Line === Line with the same coordinates but thicker
+        <Line //Border Line => Line with the same coordinates but thicker
           points={pointsString}
           length={line.totalLength}
           animationTime={props.animationTime}
